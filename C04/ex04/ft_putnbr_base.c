@@ -6,7 +6,7 @@
 /*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 19:50:14 by hyeongki          #+#    #+#             */
-/*   Updated: 2022/01/17 21:36:31 by hyeongki         ###   ########.fr       */
+/*   Updated: 2022/01/18 14:34:45 by hyeongki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	error_check(char *base)
 	return (0);
 }
 
-void	ft_putnbr_base_recur(unsigned int nbr, char *base, int len)
+void	ft_putnbr_base_recur(unsigned int nbr, char *base, unsigned int len)
 {
 	if (nbr > len)
 	{
@@ -63,7 +63,7 @@ void	ft_putnbr_base_recur(unsigned int nbr, char *base, int len)
 
 void	ft_putnbr_base(int nbr, char *base)
 {
-	int		len;
+	unsigned int	len;
 	unsigned int	num;
 
 	if (error_check(base))

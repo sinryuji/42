@@ -6,13 +6,11 @@
 /*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 20:07:12 by hyeongki          #+#    #+#             */
-/*   Updated: 2022/01/17 20:12:38 by hyeongki         ###   ########.fr       */
+/*   Updated: 2022/01/18 14:22:40 by hyeongki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-
-int ft_iterative_power(int nb, int power)
+int	ft_iterative_power(int nb, int power)
 {
 	int	result;
 
@@ -27,9 +25,4 @@ int ft_iterative_power(int nb, int power)
 		power--;
 	}
 	return (result);
-}
-
-int	main(void)
-{
-	printf("%d\n", ft_iterative_power(2, 3));
 }

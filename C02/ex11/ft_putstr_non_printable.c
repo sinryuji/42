@@ -1,42 +1,41 @@
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_putstr_non_printable.c                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/10 14:45:37 by hyeongki          #+#    #+#             */
+/*   Updated: 2022/01/14 19:35:52 by hyeongki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
-#include <stdbool.h>
 
 void	ft_putchar(char c)
 {
 	write(1, &c, 1);
 }
 
-bool	is_char_printable(char c)
+void	ft_putstr_non_printable(char *str)
 {
-	printf("c : %d\n", c);
-	return	(c >= 32 && c <= 126);
-}
-
-int ft_putstr_non_printable(char *str)
-{
-	int	i;
-	unsigned char current;
+	char			*hex;
+	int				i;
+	unsigned char	c;
 
 	i = 0;
-	while (true)
+	hex = "0123456789abcdef";
+	while (str[i] != '\0')
 	{
-		current = str[i];
-		write(1, "\n", 1);
-		printf("char : %d\n", str[i]);
-		printf("current : %d\n", current);
-		if (current == '\0')
-			break;
-		if (is_char_printable(current))
-			ft_putchar(current);
+		c = str[i];
+		if (c >= 32 && c <= 126)
+			ft_putchar(c);
 		else
 		{
 			ft_putchar('\\');
-			ft_putchar("0123456789abcdef"[current / 16]);
-			ft_putchar("0123456789abcdef"[current % 16]);
+			ft_putchar(hex[c / 16]);
+			ft_putchar(hex[c % 16]);
 		}
 		i++;
 	}
-	return 0;
 }
-
