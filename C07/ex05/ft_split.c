@@ -1,42 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_rev_params.c                                    :+:      :+:    :+:   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/19 17:02:26 by hyeongki          #+#    #+#             */
-/*   Updated: 2022/01/20 14:10:11 by hyeongki         ###   ########.fr       */
+/*   Created: 2022/01/20 20:28:00 by hyeongki          #+#    #+#             */
+/*   Updated: 2022/01/20 20:29:46 by hyeongki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <stdlib.h>
 
-int	ft_strlen(char *str)
-{
-	int	i;
+char **ft_split(char *str, char *charset)
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-int	main(int ac, char **av)
-{
-	int	i;
-	int	j;
-
-	i = ac - 1;
-	while (i > 0)
-	{
-		j = 0;
-		while (av[i][j])
-		{
-			write(1, &av[i][j], 1);
-			j++;
-		}
-		i--;
-		write(1, "\n", 1);
-	}
-}

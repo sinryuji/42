@@ -6,13 +6,13 @@
 /*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 20:18:54 by hyeongki          #+#    #+#             */
-/*   Updated: 2022/01/19 20:50:55 by hyeongki         ###   ########.fr       */
+/*   Updated: 2022/01/20 15:39:51 by hyeongki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 
-int ft_ultimate_range(int **range, int min, int max)
+int	ft_ultimate_range(int **range, int min, int max)
 {
 	int	i;
 	int	*arr;
