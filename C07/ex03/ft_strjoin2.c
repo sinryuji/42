@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include <stdlib.h>
-#include <stdio.h>
 
 int	ft_strlen(char *str)
 {
@@ -26,52 +25,34 @@ int	ft_strlen(char *str)
 int	ft_total_len(int size, char **strs, char *sep)
 {
 	int	len;
-	int i;
 
-	i = 0;
 	len = ft_strlen(sep) * (size - 1);
-	while (i < size)
-	{
-		len += ft_strlen(strs[i]);
-		i++;
-	}
-	printf("%d\n", len);
-	return (len);
+	while (size-- > 0)
+		len += ft_strlen(strs[size]);
+	if (len <= 0)
+	    return (0);
+	return (len + 1);
 }
 
-void	*val_set(int size, char **strs, char *sep, char *result)
+void	*ft_strcat(char *dest, char *src, char *sep, int *dest_i)
 {
-    int	i;
-    int	j;
-    int k;
+	int	src_i;
+	int	sep_i;
 
-    i = 0;
-    k = 0;
-    while (i < size)
-    {
-	j = 0;
-	if (strs[i])
+	src_i = 0;
+	sep_i = 0;
+	while (src[src_i])
 	{
-	    while (strs[i][j])
-	    {
-		result[k] = strs[i][j];
-		k++;
-		j++;
-	    }
+		dest[*dest_i] = src[src_i];
+		*dest_i = *dest_i + 1;
+		src_i++;
 	}
-	j = 0;
-	if (sep)
+	while (sep[sep_i])
 	{
-	    while (sep[j] && i < size - 1)
-	    {
-		result[k] = sep[j];
-		k++;
-		j++;
-	    }
-	    i++;
+		dest[*dest_i] = sep[sep_i];
+		*dest_i = *dest_i + 1;
+		sep_i++;
 	}
-    }
-    result[k] = '\0';
 }
 
 char	*ft_strjoin(int size, char **strs, char *sep)
@@ -79,7 +60,7 @@ char	*ft_strjoin(int size, char **strs, char *sep)
 	char	*result;
 	int		len;
 	int		i;
-	int j;
+	int dest_i;
 
 	if (size == 0)
 	{
@@ -88,15 +69,17 @@ char	*ft_strjoin(int size, char **strs, char *sep)
 		return (result);
 	}
 	len = ft_total_len(size, strs, sep);
-	printf("%d\n", len);
-	result = malloc(sizeof(char) * (len + 1));
-	val_set(size, strs, sep, result);
+	result = malloc(sizeof(char) * len);
+	if (!reuslt)
+	    return (NULL);
+	i = 0;
+	dest_i = 0;
+	while (i < size - 1)
+	{
+		ft_strcat(result, strs[i], sep, &dest_i);
+		i++;
+	}
+	ft_strcat(result, strs[i], "", &dest_i);
+	result[dest_i] = '\0';
 	return (result);
 }
-
-
-int main(int ac, char **av)
-{
-    printf("%s\n", ft_strjoin(ac, av, ", "));
-}
-

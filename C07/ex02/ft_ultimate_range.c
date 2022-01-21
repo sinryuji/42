@@ -16,7 +16,8 @@ int	ft_ultimate_range(int **range, int min, int max)
 {
 	int	i;
 	int	*arr;
-
+	int result;
+	
 	if (min >= max)
 	{
 		*range = NULL;
@@ -28,13 +29,14 @@ int	ft_ultimate_range(int **range, int min, int max)
 		*range = NULL;
 		return (-1);
 	}
+	result = max - min;
 	i = 0;
 	while (min < max)
 	{
 		arr[i] = min;
-		i++;
 		min++;
+		i++;
 	}
 	*range = arr;
-	return (max - min);
+	return (result);
 }

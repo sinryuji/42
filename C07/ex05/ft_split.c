@@ -11,21 +11,18 @@
 /* ************************************************************************** */
 
 #include <stdlib.h>
+#include <stdio.h>
 
-char	*ft_strdup(char *src)
+char	*ft_strdup(char *src, int n)
 {
-	int		len;
 	char	*result;
 	int		i;
 
-	len = 0;
-	while (src[len])
-		len++;
-	result = malloc(sizeof(char) * (len + 1));
+	result = malloc(sizeof(char) * (n + 1));
 	if (!result)
 		return (NULL);
 	i = 0;
-	while (src[i])
+	while (src[i] && i < n)
 	{
 		result[i] = src[i];
 		i++;
@@ -59,7 +56,7 @@ int	get_word_cnt(char *str, char *charset)
 		cnt++;
 	while (str[i])
 	{
-		if (sep_ckeck(str[i - 1], charset) && !sep_check(str[i]))
+		if (sep_check(str[i - 1], charset) && !sep_check(str[i], charset))
 			cnt++;
 		i++;
 	}
@@ -69,6 +66,46 @@ int	get_word_cnt(char *str, char *charset)
 char **ft_split(char *str, char *charset)
 {
 	char	**result;
+	int str_index;
+	int word_index;
+	int result_index;
 	
-			result = malloc(
+	result = malloc((get_word_cnt(str, charset) + 1) * sizeof(char *));
+	str_index = 0;
+	result_index = 0;
+	while (str[str_index])
+	{
+	    if (sep_check(str[str_index], charset))
+		str_index++;
+	    else 
+	    {
+		word_index = 0;
+		while (!sep_check(str[str_index], charset) && str[str_index])
+		{
+		    str_index++;
+		    word_index++;
+		}
+		result[result_index] = ft_strdup(&str[str_index - word_index], word_index);
+		result_index++;
+	    }
+	}
+	result[result_index] = 0;
+	return (result);
+}
+int main()
+{
+    char **av = ft_split("aslkdnflksadf, asdkfnaklsdnf         asnldkfaslnkdf::z af", ",. :");
+    int i = 0;
+    while (av[i] != 0)
+    {
+	int j = 0;
+	while (av[i][j])
+	{
+	    printf("%c", av[i][j]);
+	    j++;
+	}
+	i++;
+	printf("\n");
+    }
+    
 }
