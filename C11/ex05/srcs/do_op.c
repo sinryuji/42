@@ -6,7 +6,7 @@
 /*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/25 19:35:17 by hyeongki          #+#    #+#             */
-/*   Updated: 2022/01/25 21:39:50 by hyeongki         ###   ########.fr       */
+/*   Updated: 2022/01/26 20:01:57 by hyeongki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,32 +60,32 @@ int	check_oper(char *str)
 	return (0);
 }
 
-int	cal_print(int x, int y, char oper)
+void	cal_print(int x, int y, char oper, int (*fp[])(int, int))
 {
 	if (oper == '+')
-	{
-		ft_putnbr(x + y);
-		write(1, "\n", 1);
-	}
+		ft_putnbr(fp[0](x, y));
 	if (oper == '-')
-	{
-		ft_putnbr(x - y);
-		write(1, "\n", 1);
-	}
+		ft_putnbr(fp[1](x, y));
 	if (oper == '/')
-	{
-		ft_putnbr(x / y);
-		write(1, "\n", 1);
-	}
+		ft_putnbr(fp[3](x, y));
 	if (oper == '%')
-	{
-		ft_putnbr(x % y);
-		write(1, "\n", 1);
-	}
+		ft_putnbr(fp[4](x, y));
 	if (oper == '*')
+		ft_putnbr(fp[2](x, y));
+	write(1, "\n", 1);
+}
+
+int	check_error(char c, int	y)
+{
+	if (c == '/' && y == 0)
 	{
-		ft_putnbr(x * y);
-		write(1, "\n", 1);
+		ft_putstr("Stop : division by zero");
+		return (1);
 	}
-	return (1);
+	if (c == '%' && y == 0)
+	{
+		ft_putstr("Stop : modulo by zero");
+		return (1);
+	}
+	return (0);
 }
