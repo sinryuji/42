@@ -14,8 +14,8 @@ typedef struct s_result t_result;
 
 struct s_result
 {
-	char **line;
-	char *og;
+	char	*contents;
+	int		length;
 };
 
 /* string.c */
@@ -25,15 +25,10 @@ void	ft_putstr(char *str);
 char	*ft_strjoin(char *storage, char *readbuf);
 int		ft_atoi(char *str);
 
-/* ft_split.c */
-char	*ft_strdup(char *src, int n);
-int		sep_check(char c, char *charset);
-int		get_word_cnt(char *str, char *charset);
-char	**ft_split(char *str, char *charset);
-
-/* ft_tail.c */
+/* ft_hexdump.c */
 t_result	*read_file(int fd);
-void		print_tail(char **line);
-void		print_c(char *og, char *nb);
+void		print_hexnum(int i);
+void		print_hexdump(t_result *result);
+void		print_c(t_result *result);
 
 #endif

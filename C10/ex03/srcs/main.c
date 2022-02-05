@@ -1,16 +1,16 @@
-#include "ft_tail.h"
+#include "ft_hexdump.h"
 
 int main(int ac, char **av)
 {
 	t_result *result;
 	int	fd;
 
-	if (ac == 2 || ac == 4)
+	if (ac == 2 || ac == 3)
 	{
 		if (ac == 2)
 			fd = open(av[1], O_RDONLY);
 		else
-			fd = open(av[3], O_RDONLY);
+			fd = open(av[2], O_RDONLY);
 
 		if (fd == -1)
 		{
@@ -19,17 +19,14 @@ int main(int ac, char **av)
 			return (0);
 		}	
 		result = read_file(fd);	
-
 		if (ac == 2)
-			print_tail(result->line);
+			print_hexdump(result);
 		else
-			print_c(result->og, av[2]);
-		free(result->og);
-		free(result->line);
+			print_c(result);
 		free(result);
 	}
-	else if (ac == 1 || ac == 3)
+	else if (ac == 1)
 		write(1, "File name missing.\n", 19);
-	else if (ac > 4)
+	else if (ac > 3)
 		write(1, "Too many arguments.\n", 20);
 }

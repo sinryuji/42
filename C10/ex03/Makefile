@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra
 SRC_DIR = srcs/
 INC_DIR = includes/
-SRC_NAME = main.c ft_split.c ft_tail.c string.c
+SRC_NAME = main.c ft_hexdump.c string.c
 SRCS = $(addprefix $(SRC_DIR), $(SRC_NAME))
 OBJS = $(SRCS:.c=.o)
 TARGET = ft_hexdump
