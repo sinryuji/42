@@ -1,0 +1,23 @@
+# Object files
+*.o
+*.obj
+
+# Libraries
+*.lib
+*.a
+
+# Executables
+*.exe
+*.out
+pipex
+
+# LLDB
+*.dSYM
+
+# Header
+*.gch
+
+# Swap
+*.swp
+
+# Tester
