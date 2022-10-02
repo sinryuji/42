@@ -6,7 +6,7 @@
 #    By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/29 10:23:59 by hyeongki          #+#    #+#              #
-#    Updated: 2022/09/29 11:12:18 by hyeongki         ###   ########.fr        #
+#    Updated: 2022/10/02 21:18:09 by hyeongki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,12 +46,12 @@ $(NAME) :  $(OBJS)
 
 clean :
 	@$(RM) $(OBJS) $(BONUS_OBJS) 
-	@make -C $(FT_LIBFT_PATH) clean
+	@make -C $(FT_PRINTF_PATH) clean
 	@echo "$(NAME): $(RED)object files were deleted$(RESET)"
 
 fclean : clean
 	@$(RM) $(NAME)
-	@make -C $(FT_LIBFT_PATH) fclean
+	@make -C $(FT_PRINTF_PATH) fclean
 	@echo "$(NAME): $(RED)$(NAME) was deleted$(RESET)"
 
 re : fclean all

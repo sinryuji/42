@@ -20,4 +20,6 @@ pipex
 # Swap
 *.swp
 
-# Tester
+# Result
+infile
+outfile
