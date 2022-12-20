@@ -180,7 +180,7 @@ void	execve_cmd(t_cmd *cmd, char **envp)
 		if (pipe_flag == 1)
 		{
 			close(cmd->fd[STD_OUT]);
-			if (cmd->type == TYPE_BREAK || !cmd->next)
+			if (cmd->type == TYPE_BREAK || cmd->type == TYPE_END)
 				close(cmd->fd[STD_IN]);
 		}	
 		if (cmd->prev && cmd->prev->type == TYPE_PIPE)
@@ -249,6 +249,18 @@ int main(int argc, char **argv, char **envp)
 	if (cmd)
 		execute_cmd(cmd, envp);
 	free_cmd(cmd);
+//	while (cmd)
+//	{
+//		int j = 0;
+//		while (cmd->argv[j])
+//		{
+//			printf ("%s ", cmd->argv[j]);
+//			j++;
+//		}
+//		printf("%d", cmd->type);
+//		cmd = cmd->next;
+//		printf("\n");
+//	}
 	if (TEST)
 		while (1);	
 	return (EXIT_SUCCESS);

@@ -1,11 +1,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
-#define STD_IN 0
-#define STD_OUT 1
-#define STD_ERR 2
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
 
 #define TYPE_END 0
 #define TYPE_PIPE 1
@@ -17,19 +16,18 @@
 #endif
 typedef struct s_cmd
 {
-	char 			**argv;
-	int				type;
-	int				size;
-	int				fd[2];
-	struct s_cmd	*prev;
+	char **argv;
+	int size;
+	int	fd[2];
+	int type;
 	struct s_cmd	*next;
+	struct s_cmd	*prev;
 }	t_cmd;
 
-int ft_strlen(char *str)
+int	ft_strlen(char *str)
 {
-	int	i;
+	int	i = 0;
 
-	i = 0;
 	if (!str)
 		return (0);
 	while (str[i])
@@ -39,38 +37,46 @@ int ft_strlen(char *str)
 
 void	err_fatal()
 {
-	write(STD_ERR, "error: fatal\n", ft_strlen("error_fatal\n"));
+	char *msg = "error: fatal\n";
+
+	write(STDERR, msg, ft_strlen(msg));
 	exit(EXIT_FAILURE);
 }
 
-void	err_cd1()
+void	err_cd_1()
 {
-	write(STD_ERR, "error: cd: bad arguments\n", ft_strlen("error: cd: bad arguments\n"));
+	char *msg = "error: cd: bad arguments\n";
+
+	write(STDERR, msg, ft_strlen(msg));
 }
 
-void	err_cd2(char *path)
+void	err_cd_2(char *path)
 {
-	write(STD_ERR, "error: cd: cannot change directory to ", ft_strlen("error: cd: cannot change directory to "));
-	write(STD_ERR, path, ft_strlen(path));
-	write(STD_ERR, "\n", ft_strlen("\n"));
+	char *msg = "error: cd: cannot change ";
+
+	write(STDERR, msg, ft_strlen(msg));
+	write(STDERR, path, ft_strlen(path));
+	write(STDERR, "\n", 1);
 }
 
 void	err_execve(char *path)
 {
-	write(STD_ERR, "error: cannot execute ", ft_strlen("error: cannot execute "));
-	write(STD_ERR, path, ft_strlen(path));
-	write(STD_ERR, "\n", ft_strlen("\n"));
-	exit(EXIT_FAILURE);
+	char *msg = "error: cannot execute ";
+
+	write(STDERR, msg, ft_strlen(msg));
+	write(STDERR, path, ft_strlen(path));
+	write(STDERR, "\n", 1);
 }
 
 char *ft_strdup(char *str)
 {
 	int i = 0;
-	char	*new;
+	char *new;
 
 	if (!str)
 		return (NULL);
-	if (!(new = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1))))
+	new = malloc(sizeof(char) * (ft_strlen(str) + 1));
+	if (!new)
 		err_fatal();
 	while (str[i])
 	{
@@ -84,18 +90,10 @@ char *ft_strdup(char *str)
 int	argv_size(char **argv)
 {
 	int	i = 0;
+
 	while (argv[i] && strcmp(argv[i], "|") != 0 && strcmp(argv[i], ";") != 0)
 		i++;
 	return (i);
-}
-
-t_cmd *get_last_node(t_cmd *cmd)
-{
-	if (!cmd)
-		return (NULL);
-	while (cmd->next)
-		cmd = cmd->next;
-	return (cmd);
 }
 
 void	ft_lstadd_back(t_cmd **cmd, t_cmd *new)
@@ -114,35 +112,39 @@ void	ft_lstadd_back(t_cmd **cmd, t_cmd *new)
 	}
 }
 
-int	get_type(char *argv)
+int get_type(char *argv)
 {
 	if (argv == NULL)
 		return (TYPE_END);
-	if (strcmp(argv, "|") == 0)
+	else if (strcmp(argv, "|") == 0)
 		return (TYPE_PIPE);
 	else if (strcmp(argv, ";") == 0)
 		return (TYPE_BREAK);
-	return (0);
+	return (TYPE_END);
 }
 
 int	parse(t_cmd **cmd, char **argv)
 {
-	int	size = argv_size(argv);
+	int size = argv_size(argv);
 	t_cmd *new;
-	int	i = 0;
+	int i = 0;
 
-	if (!(new = (t_cmd *)malloc(sizeof(t_cmd))))
+	new = malloc(sizeof(t_cmd));
+	if (!new)
 		err_fatal();
-	if (!(new->argv = (char **)malloc(sizeof(char *) * (size + 1))))
+	new->argv = malloc(sizeof(char *) * (size + 1));
+	if (!(new->argv))
 		err_fatal();
 	while (i < size)
 	{
 		new->argv[i] = ft_strdup(argv[i]);
-		i++;		
+		i++;
 	}
-	new->argv[i] = NULL;
+	new->argv[size] = NULL;
+	new->type = get_type(argv[i]);
 	new->size = size;
-	new->type = get_type(argv[size]);
+	new->next = NULL;
+	new->prev = NULL;
 	ft_lstadd_back(cmd, new);
 	if (new->type == TYPE_PIPE || new->type == TYPE_BREAK)
 		size++;
@@ -151,9 +153,9 @@ int	parse(t_cmd **cmd, char **argv)
 
 void	execve_cmd(t_cmd *cmd, char **envp)
 {
-	int	status;
-	pid_t	pid;
-	int	pipe_flag;
+	int status;
+	pid_t pid;
+	int pipe_flag;
 
 	pipe_flag = 0;
 	if (cmd->type == TYPE_PIPE || (cmd->prev && cmd->prev->type == TYPE_PIPE))
@@ -167,9 +169,9 @@ void	execve_cmd(t_cmd *cmd, char **envp)
 		err_fatal();
 	if (pid == 0)
 	{
-		if (cmd->type == TYPE_PIPE && dup2(cmd->fd[STD_OUT], STD_OUT) < 0)
+		if (cmd->type == TYPE_PIPE && dup2(cmd->fd[STDOUT], STDOUT) < 0)
 			err_fatal();
-		if ((cmd->prev && cmd->prev->type == TYPE_PIPE) && dup2(cmd->prev->fd[STD_IN], STD_IN) < 0)
+		if (cmd->prev && cmd->prev->type == TYPE_PIPE && dup2(cmd->prev->fd[STDIN], STDIN) < 0)
 			err_fatal();
 		if (execve(cmd->argv[0], cmd->argv, envp) < 0)
 			err_execve(cmd->argv[0]);
@@ -179,12 +181,12 @@ void	execve_cmd(t_cmd *cmd, char **envp)
 		waitpid(pid, &status, 0);
 		if (pipe_flag == 1)
 		{
-			close(cmd->fd[STD_OUT]);
+			close(cmd->fd[STDOUT]);
 			if (cmd->type == TYPE_BREAK || !cmd->next)
-				close(cmd->fd[STD_IN]);
-		}	
+				close(cmd->fd[STDIN]);
+		}
 		if (cmd->prev && cmd->prev->type == TYPE_PIPE)
-			close(cmd->prev->fd[STD_IN]);
+			close(cmd->prev->fd[STDIN]);
 	}
 }
 
@@ -195,12 +197,12 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	tmp = cmd;
 	while (tmp)
 	{
-		if (strcmp(cmd->argv[0], "cd") == 0)
+		if (strcmp(tmp->argv[0], "cd") == 0)
 		{
-			if (cmd->size < 2)
-				err_cd1();
-			else if (chdir(cmd->argv[1]))
-				err_cd2(cmd->argv[1]);
+			if (tmp->size < 2)
+				err_cd_1();
+			else if (chdir(tmp->argv[1]))
+				err_cd_2(tmp->argv[1]);
 		}
 		else
 			execve_cmd(tmp, envp);
@@ -208,35 +210,34 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	}
 }
 
-void free_cmd(t_cmd *cmd)
+void	free_all(t_cmd *cmd)
 {
 	t_cmd *tmp;
-	int i = 0;
+	int	i;
 
-	while (cmd)
+	tmp = cmd;
+	while (tmp)
 	{
-		tmp = cmd->next;
 		i = 0;
-		while (cmd->argv[i])
+		while (tmp->argv[i])
 		{
-			free(cmd->argv[i]);
+			free(tmp->argv[i]);
 			i++;
 		}
-		free(cmd->argv);
-		free(cmd);
-		cmd = tmp;
+		free(tmp->argv);
+		free(tmp);
+		tmp = tmp->next;
 	}
 }
 
 int main(int argc, char **argv, char **envp)
 {
-	t_cmd	*cmd;
-	int	i;
+	t_cmd *cmd;
+	int	i = 1;
 
-	if (argc < 1)
-		return (EXIT_SUCCESS);
 	cmd = NULL;
-	i = 1;
+	if (argc < 2)
+		return (EXIT_SUCCESS);;
 	while (argv[i])
 	{
 		if (strcmp(argv[i], ";") == 0)
@@ -248,8 +249,8 @@ int main(int argc, char **argv, char **envp)
 	}
 	if (cmd)
 		execute_cmd(cmd, envp);
-	free_cmd(cmd);
+	free_all(cmd);
 	if (TEST)
-		while (1);	
+		while (1);
 	return (EXIT_SUCCESS);
 }
