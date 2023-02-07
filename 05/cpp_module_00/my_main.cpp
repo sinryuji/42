@@ -2,9 +2,16 @@
 
 int main()
 {
-  MyWarlock bob;                            //Does not compile
-  MyWarlock bob("Bob", "the magnificent");  //Compiles
-  Warlock jim("Jim", "the nauseating");   //Compiles
-  bob = jim;                              //Does not compile
-  Warlock jack(jim);                      //Does not compile
+  MyWarlock const richard("Richard", "Mistress of Magma");
+  richard.introduce();
+  std::cout << richard.getName() << " - " << richard.getTitle() << std::endl;
+
+  MyWarlock* jack = new MyWarlock("Jack", "the Long");
+  jack->introduce();
+  jack->setTitle("the Mighty");
+  jack->introduce();
+
+  delete jack;
+
+  return (0);
 }
