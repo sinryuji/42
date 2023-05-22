@@ -27,6 +27,10 @@ typedef struct s_client {
   struct s_client* next;
 } t_client;
 
+t_client* clients = NULL;
+fd_set reads;
+fd_set writes;
+
 void fatal() {
   char* msg = "Fatal error\n";
   write(2, msg, strlen(msg));
@@ -41,7 +45,6 @@ void set_fd_max(int fd, int* fd_max) {
 char* ft_strdup(char* str) {
   char* ret;
   int len;
-  int i;
 
   if (!str)
     return NULL;
@@ -77,7 +80,8 @@ char* ft_substr(char* str, int n) {
   ret[i] = 0;
 
   char* tmp = ft_strdup(str);
-  if (!(str = (char*)realloc(str, sizeof(char) * (strlen(str) - n))))
+  free(str);
+  if (!(str = (char*)malloc(sizeof(char) * (strlen(str) - n))))
     fatal();
   i = n + 1;
   int str_i = 0;
@@ -91,11 +95,12 @@ char* ft_substr(char* str, int n) {
   return ret;
 }
 
-void send_to_all_clients(char* msg, fd_set* writes, t_client* clients) {
+void send_to_all_clients(char* msg, fd_set* writes) {
   t_client* tmp = clients;
 
   while (tmp) {
-    free(tmp->send_buf->buf);
+    if (tmp->send_buf->buf != NULL)
+      free(tmp->send_buf->buf);
     tmp->send_buf->buf = ft_strdup(msg);
     tmp->send_buf->buf_size = strlen(msg);
     FD_SET(tmp->fd, writes);
@@ -122,7 +127,7 @@ void init_buffer(t_client* client) {
   client->send_buf = send_buf;
 }
 
-void add_client(int client_fd, int client_id, t_client* clients) {
+void add_client(int client_fd, int client_id) {
   t_client* tmp = clients;
   t_client* new;
 
@@ -141,7 +146,7 @@ void add_client(int client_fd, int client_id, t_client* clients) {
   }
 }
 
-void accept_connect(int serv_fd, int* fd_max, int* client_id, t_client* clients, fd_set* writes) {
+void accept_connect(int serv_fd, int* fd_max, int* client_id, fd_set* writes) {
   struct sockaddr_in  client_addr;
   socklen_t len = sizeof(client_addr);
   int client_fd;
@@ -150,15 +155,15 @@ void accept_connect(int serv_fd, int* fd_max, int* client_id, t_client* clients,
   if ((client_fd = accept(serv_fd, (struct sockaddr *)&client_addr, &len))) {
     fcntl(client_fd, F_SETFL, O_NONBLOCK);
     set_fd_max(client_fd, fd_max);
+    FD_SET(client_fd, &reads);
     *client_id += 1;
-    add_client(client_fd, *client_id, clients);
+    add_client(client_fd, *client_id);
     sprintf(msg, "server: client %d just arrived\n", *client_id);
-    send_to_all_clients(msg, writes, clients);
+    send_to_all_clients(msg, writes);
   }
-  printf("here?");
 }
 
-t_client* get_client(int fd, t_client* clients) {
+t_client* get_client(int fd) {
   t_client* tmp = clients;
 
   while (tmp) {
@@ -170,7 +175,8 @@ t_client* get_client(int fd, t_client* clients) {
   return NULL;
 }
 
-void add_recv_buf(t_buffer* buf, char* data) {
+void add_recv_buf(int fd, char* data) {
+  t_buffer* buf = get_client(fd)->recv_buf;
   if (!buf->buf) {
     if (!(buf->buf = (char*)malloc(sizeof(char) * (strlen(data) + 1))))
         fatal();
@@ -178,55 +184,64 @@ void add_recv_buf(t_buffer* buf, char* data) {
   }
   else {
     char* tmp = ft_strdup(buf->buf);
-    if (!(buf->buf = realloc(buf->buf, (strlen(tmp) + strlen(data) + 1))))
+    free(buf->buf);
+    if (!(buf->buf = malloc(strlen(tmp) + strlen(data) + 1)))
       fatal();
     strcpy(buf->buf, tmp);
     strcat(buf->buf, data);
   }
 }
 
-void add_queue(t_msg* queue, char* msg) {
+void add_queue(int fd, char* msg) {
   t_msg* new;
+  t_client* cli = get_client(fd);
 
   if (!(new = (t_msg*)malloc(sizeof(t_msg))))
     fatal();
   new->msg = ft_strdup(msg);
 
-  if (!queue)
-    queue = new;
+  if (!cli->queue) {
+    cli->queue = new;
+  }
   else {
-    t_msg* tmp = queue;
+    t_msg* tmp = cli->queue;
     while (tmp->next)
       tmp = tmp->next;
     tmp->next = new;
   }
+
 }
 
-void parse_recv(t_buffer* buf, t_msg* queue) {
+void parse_recv(int fd) {
   int i = 0;
   char* line;
+  t_buffer* buf = get_client(fd)->recv_buf;
 
   while(buf->buf[i]) {
     if (buf->buf[i] == '\n') {
       line = ft_substr(buf->buf, i);
-      add_queue(queue, line);
+      add_queue(fd, line);
       free(line);
       i = 0;
       continue;
     }
+    i++;
   }
 }
 
-void remove_queue(t_msg* queue) {
-  free(queue->msg);
-  queue = queue->next;
+void remove_queue(int fd) {
+  t_client* cli = get_client(fd);
+  t_msg* tmp = cli->queue;
+  cli->queue = cli->queue->next;
+  free(tmp->msg);
+  free(tmp);
 }
 
 void clean_client(t_client* client, fd_set* reads) {
   t_msg* queue = client->queue;
   t_msg* tmp;
   
-  while (tmp) {
+  while (queue) {
     tmp = queue;
     queue = queue->next;
     free(tmp->msg);
@@ -238,14 +253,13 @@ void clean_client(t_client* client, fd_set* reads) {
   free(client);
 }
 
-void remove_client(int fd, t_client* clients, fd_set* reads) {
+void remove_client(int fd, fd_set* reads) {
   char msg[BUF_SIZE];
   t_client* tmp = clients;
-  t_client* tmp_msg;
   t_client* tmp2;
   int flag = 0;
 
-  sprintf(msg, "server: client %d just left\n", get_client(fd, clients)->id);
+  sprintf(msg, "server: client %d just left\n", get_client(fd)->id);
 
   if (tmp && tmp->fd == fd) {
     clients = tmp->next;
@@ -271,17 +285,16 @@ void send_msg(t_client* clients, fd_set* writes) {
 
   while (tmp) {
     if (tmp->queue) {
-      sprintf(msg, "client %d: ", tmp->id);
-      ft_strcat(msg, tmp->queue->msg);
-      send_to_all_clients(msg, writes, clients);
-      remove_queue(tmp->queue);
+      sprintf(msg, "client %d: %s\n", tmp->id, tmp->queue->msg);
+      send_to_all_clients(msg, writes);
+      remove_queue(tmp->fd);
       break;
     }
     tmp = tmp->next;
   }
 }
 
-void receive_data(int fd, t_client* clients, int client_id, fd_set* reads, fd_set* writes) {
+void receive_data(int fd, fd_set* reads, fd_set* writes) {
   char buf[BUF_SIZE + 1];
   char msg[BUF_SIZE];
   int recv_size;
@@ -289,31 +302,30 @@ void receive_data(int fd, t_client* clients, int client_id, fd_set* reads, fd_se
   
   recv_size = recv(fd, buf, BUF_SIZE, MSG_DONTWAIT);
   if (recv_size <= 0)
-    remove_client(fd, clients, reads);
-  client = get_client(fd, clients);
+    remove_client(fd, reads);
+  buf[recv_size ] = 0;
+  client = get_client(fd);
   client->recv_buf->buf_size += recv_size;
-  add_recv_buf(client->recv_buf, buf);
-  parse_recv(client->recv_buf, client->queue);
-
-  printf("recv data : %s", buf);
+  add_recv_buf(fd, buf);
+  parse_recv(fd);
   
   if (client->queue) {
-    sprintf(msg, "client %d: ", client->id);
-    ft_strcat(msg, client->queue->msg);
-    send_to_all_clients(msg, writes, clients);
-    remove_queue(client->queue);
+    sprintf(msg, "client %d: %s\n", client->id, client->queue->msg);
+    send_to_all_clients(msg, writes);
+    remove_queue(fd);
   }
 }
 
-void send_data(int fd, t_client* clients, fd_set* reads, fd_set* writes) {
+void send_data(int fd, fd_set* reads, fd_set* writes) {
   int send_size;
-  t_client* client = get_client(fd, clients);
+  t_client* client = get_client(fd);
 
   send_size = send(fd, client->send_buf->buf, client->send_buf->buf_size, MSG_DONTWAIT);
   if (send_size <= 0)
-    remove_client(fd, clients, reads);
+    remove_client(fd, reads);
   if (send_size == client->send_buf->buf_size) {
-    free(client->send_buf->buf);
+//    if (client->send_buf->buf != NULL)
+//      free(client->send_buf->buf);
     client->send_buf->buf_size = 0;
     FD_CLR(fd, writes);
   }
@@ -325,13 +337,11 @@ void send_data(int fd, t_client* clients, fd_set* reads, fd_set* writes) {
 
 int main(int argc, char** argv) {
   int serv_fd;
-  fd_set reads;
-  fd_set writes;
   int fd_max = -1;
   int client_id = 0;
   struct sockaddr_in servaddr;
   int port;
-  t_client* clients;
+  struct timeval t;
 
   if (argc != 2) {
     char* msg = "Wrong number of arguments\n";
@@ -360,25 +370,29 @@ int main(int argc, char** argv) {
   FD_ZERO(&writes);
   FD_SET(serv_fd, &reads);
 
+  t.tv_sec = 1;
+  t.tv_usec = 0;
+
   while(1) {
     fd_set reads_cpy = reads;
     fd_set writes_cpy = writes;
 
     send_msg(clients, &writes);
 
-    if (select(fd_max + 1, &reads_cpy, &writes_cpy, 0 , 0) == -1)
+    if (select(fd_max + 1, &reads_cpy, &writes_cpy, 0 , &t) == -1)
       break;
 
-    for (int i = 0; i < fd_max; i++) {
+    for (int i = 0; i < fd_max + 1; i++) {
       if (FD_ISSET(i, &reads_cpy)) {
         if (i == serv_fd) {
-          accept_connect(i, &fd_max, &client_id, clients, &writes);
+          accept_connect(i, &fd_max, &client_id, &writes);
         }
         else
-          receive_data(i, clients, client_id, &reads, &writes);
+          receive_data(i, &reads, &writes);
       }
-      else if (FD_ISSET(i, &writes_cpy))
-        send_data(i, clients, &reads, &writes);
+      else if (FD_ISSET(i, &writes_cpy)) {
+        send_data(i, &reads, &writes);
+      }
     }
   }
 
