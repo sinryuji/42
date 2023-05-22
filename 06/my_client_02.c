@@ -32,11 +32,11 @@ int main(int argc, char** argv) {
     exit(1);
 
   fcntl(sock_fd, F_SETFL, O_NONBLOCK);
-  char buf[100001];
-  for (int i = 0; i < 100000; i++)
+  char buf[101];
+  for (int i = 0; i < 100; i++)
     buf[i] = 'a';
-  buf[100000]  = 0;
-  send(sock_fd, buf, 100000, 0);
+  buf[100]  = 0;
+  send(sock_fd, buf, 100, 0);
   sleep(5);
   
   char buf2[11];
