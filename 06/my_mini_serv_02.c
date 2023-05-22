@@ -216,7 +216,7 @@ void accept_connection(int fd) {
 char* parse_recv(int fd) {
   client* client = get_client(fd);
   char* line;
-  char msg[BUF_SIZE];
+  char msg[BUF_SIZE * 2];
   char* ret = NULL;
   
   while(extract_message(&client->recv_buf, &line)) {
@@ -240,8 +240,10 @@ void recv_data(int fd) {
     buf[recv_size] = 0;
     client->recv_buf = str_join(client->recv_buf, buf);
     char* msg = parse_recv(fd);
-    send_all(fd, msg);
-    free(msg);
+    if (msg != NULL) {
+      send_all(fd, msg);
+      free(msg);
+    }
   }
 }
 
