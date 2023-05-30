@@ -35,8 +35,8 @@ int main(int argc, char** argv) {
       exit(1);
     if (connect(sock_fd, (const struct sockaddr *)&cli, sizeof(cli)) < 0)
       exit(1);
-    usleep(10);
     close(sock_fd);
+    usleep(10);
   }
 
 }
