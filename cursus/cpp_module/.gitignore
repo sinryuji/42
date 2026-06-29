@@ -1,0 +1,8 @@
+# Object files
+*.o
+
+# Header
+*.gch
+
+.DS_Store
+tags
