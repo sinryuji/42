@@ -1,0 +1,25 @@
+# Object files
+*.o
+*.obj
+
+# Libraries
+*.lib
+*.a
+
+# Executables
+*.exe
+*.out
+philo/philo
+
+# LLDB
+*.dSYM
+
+# Header
+*.gch
+
+# Swap
+*.swp
+
+# Tester
+tester/
+tester2/
