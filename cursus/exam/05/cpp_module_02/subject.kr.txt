@@ -1,0 +1,78 @@
+Assignment name  : cpp_module_02
+Expected files   : Warlock.cpp Warlock.hpp
+                   ASpell.hpp ASpell.cpp
+				   ATarget.hpp ATarget.cpp
+				   Fwoosh.hpp Fwoosh.cpp
+				   Dummy.hpp Dummy.cpp
+				   Fireball.hpp Fireball.cpp
+				   Polymorph.hpp Polymorph.cpp
+				   BrickWall.hpp BrickWall.cpp
+				   SpellBook.hpp SpellBook.cpp
+				   TargetGenerator.hpp TargetGenerator.cpp
+--------------------------------------------------------------------------------
+
+워록, 스펠북, 타겟 생성자 클래스에서 스위치 사용 금지.
+
+다음 스펠을 두개 만들어라, Fwoosh와 비슷하다
+
+* Fireball (Name: "Fireball", Effects: "burnt to a crisp")
+* Polymorph (Name: "Polymorph", Effects: "turned into a critter")
+
+여기에 더해, 그가 공격할 더미만 가지지 않도록, 그를 위해 새로운 목표물을 만들자, 
+그것은 브릭 월이 될 것이다(타입: "눈에 띄지 않는 붉은 벽돌 벽").
+
+이제 스펠북 클래스를 만들자, 캐노니컬 폼으로, 그것은 복사하거나 복사하여 인스턴스화 될 수 없다.
+이 것은 다음 함수들을 가진다:
+
+* void learnSpell(ASpell*), 책에서 주문을 복사한다.
+* void forgetSpell(string const &), 책에서 주문을 삭제한다. 책에 주문이 없는 경우 제외
+* ASpell* createSpell(string const &), 주문의 이름에 해당하는 string을 받고 만들고,
+반환한다.
+
+이제 워록을 수정하자, 워록과 함게 만들고 파괴될 스펠북을 만들자. 또한 그의 learnSpell과
+forgetSpell 함수는 스펠북의 그것들을 호출해야 된다.
+
+launchSpell 함수는 사용할 스펠을 찾기 위해 스펠북을 사용해야 한다.
+
+TargetGenerator 클래스를 만들어라, 캐노니컬 폼으로, 복사되면 안된다.
+
+다음 함수들을 가진다:
+
+* void learnTargetType(ATarget*), 생성자에게 타겟을 가르친다.
+
+* void forgetTargetType(string const &), 그가 알고 있는 타겟을 지운다.
+
+* ATarget* createTarget(string const &), 특정 타겟을 만든다.
+
+휴 다 됐다. 여기에 테스트 메인문이 있다.
+
+int main()
+{
+  Warlock richard("Richard", "foo");
+  richard.setTitle("Hello, I'm Richard the Warlock!");
+  BrickWall model1;
+
+  Polymorph* polymorph = new Polymorph();
+  TargetGenerator tarGen;
+
+  tarGen.learnTargetType(&model1);
+  richard.learnSpell(polymorph);
+
+  Fireball* fireball = new Fireball();
+
+  richard.learnSpell(fireball);
+
+  ATarget* wall = tarGen.createTarget("Inconspicuous Red-brick Wall");
+
+  richard.introduce();
+  richard.launchSpell("Polymorph", *wall);
+  richard.launchSpell("Fireball", *wall);
+}
+
+~$ ./a.out | cat -e
+Richard: This looks like another boring day.$
+Richard: I am Richard, Hello, I'm Richard the Warlock!!$
+Inconspicuous Red-brick Wall has been turned into a critter!$
+Inconspicuous Red-brick Wall has been burnt to a crisp!$
+Richard: My job here is done!$
+~$

@@ -1,0 +1,32 @@
+Assignment name  : microshell
+Expected files   : *.c *.h
+Allowed functions: malloc, free, write, close, fork, waitpid, signal, kill, exit, chdir, execve, dup, dup2, pipe, strcmp, strncmp
+--------------------------------------------------------------------------------------
+
+셸 명령을 실행하는 것처럼 동작하는 프로그램 작성
+- 실행할 명령줄은 이 프로그램의 인수가 됩니다.
+- 실행 파일의 경로는 절대적이거나 상대적이지만 프로그램이 경로를 작성해서는 안 됩니다(예: PATH 변수에서).
+- bash처럼 "|" 및 ";"를 구현해야 합니다.
+- 우리는 "|"가 바로 뒤에 있거나 아무것도, "|" 또는 ";"가 뒤에 오는 것을 절대 시도하지 않을 것이다.
+- 프로그램은 경로를 인수('-' 또는 매개 변수 없음)로만 기본 제공 명령어 cd를 구현해야 합니다.
+- 만약 cd가 잘못된 수의 인수를 가지고 있다면 당신의 프로그램은 STDERR "error: cd: bad arguments" 뒤에 '\n'을 붙여야 한다.
+- 만약 cd가 실패했다면 당신의 프로그램은 STDERR "error: cd: cannot change 디렉토리를 path_to_change로"로 인쇄하고 path_to_change가 cd 인수로 대체되어야 한다.
+- cd 명령어는 "|" 뒤에 바로 붙거나 앞에 붙지 않습니다.
+- 어떤 유형의 와일드카드(*, ~ 등)도 관리할 필요가 없습니다.)
+- 환경 변수를 관리할 필요가 없습니다($BLA...).
+- exece 및 chdir를 제외한 시스템 호출이 오류를 반환하면 프로그램이 STDERR에서 "error: fatal"을 즉시 인쇄한 후 '\n'이 표시되고 프로그램이 종료됩니다.
+- execute가 실패한 경우 STDERR에서 "error: cannot executable_that_failed"를 인쇄한 후 executable_that_failed가 실패한 실행 파일의 경로로 대체된 '\n'을 인쇄해야 합니다(execute의 첫 번째 인수여야 함).
+- 열려 있는 파일 수를 30개 미만으로 제한하더라도 프로그램에서 수백 개 이상의 "|"을 관리할 수 있어야 합니다.
+
+예를 들어, 이 기능은 다음과 같습니다.
+
+$>./microshell /bin/ls "|" /usr/bin/grep microshell ";" /bin/echo i love my microshell
+microshell
+i love my microshell
+$>
+
+힌트:
+실행할 환경 변수를 전달하는 것을 잊지 마십시오.
+
+힌트:
+파일 설명자를 유출하지 마십시오!

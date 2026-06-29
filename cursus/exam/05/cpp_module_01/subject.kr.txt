@@ -1,0 +1,84 @@
+Assignment name  : cpp01_02
+Expected files   : Warlock.cpp Warlock.hpp
+                   ASpell.hpp ASpell.cpp
+				   ATarget.hpp ATarget.cpp
+				   Fwoosh.hpp Fwoosh.cpp
+				   Dummy.hpp Dummy.cpp
+--------------------------------------------------------------------------------
+
+워록 클래스 안에서, switch 문은 금지이고 사용하면 -42점을 받는다.
+
+추상 클래스인 ASpell을 만들어라, 코플린 폼으로, 그것은 다음 프로텍티드 멤버를 가진다:
+
+* name (string)
+* effects (string)
+
+둘 다 게터를 가지고 있고 string을 반환한다.
+
+또한 ASpell 포인터를 반환하는 순수 복사 메서드를 추가하라.
+
+이 모든 함수들은 const 객체에서 호출 할 수 있어야 한다.
+
+ASpell은 이름과 효가를 받는 생성자가 있어야 한다.
+
+이제 당신은 ATraget 추상 클래스를 만들 것이다, 코플린 폼으로. 이것은 type 멤버를 가지고,
+string이고, 관련된 getter인 getType이 있다. 이 것은 const 참조자 string을 반환한다.
+
+이 것은 ASpell과 마찬가지로 clone() 순수 함수가 있어야 한다.
+
+이 모든 함수는 const 객체에서 호출 할 수 있어야 한다.
+
+type을 받는 생성자가 있어야 한다.
+
+이제 ATarget에 ASpell의 const 참조자를 매개변수로 받는 getHitBySpell 함수를 추가하라.
+
+이 것은 다음과 같이 출력해야 한다.
+
+<TYPE> has been <EFFECTS>!
+
+<TYPE>은 ATarget의 type, <EFFECTS>는 ASpell의 getEffects 함수의 반환 값이다.
+
+마지막으로, ASpell 클래스에 ATarget의 const 참조자를 매개변수로 받는 
+launch 함수를 추가하라.
+
+이것은 단순히 전달된 객체의 getHitBySpell를 호출하여 현재 객체를 매개 변수로 전달한다.
+
+이걸 모드 하고 나서 ASpell의 구현인 Fwoosh를 만들어라. 이 것의 기본 생성자는 name을
+"Fwoosh"로 세팅하고 effects는 "fwooshed"로 세팅하라. 당신은 당연하게도 clone 함수를
+구현해야 한다. Fwoosh의 경우, 이 것은 새로운 Fwoosh 객체의 포인터를 반환한다.
+
+이와 같은 방법으로, ATarget의 구현체는 Dummy을 만들어라, type은
+"Target Practice Dummy"다. 당신은 clone() 함수를 구현해야 한다.
+
+Warlock에 다음 멤버 함수들을 추가하라:
+
+* learnSpell, ASpell 포인터를 받고 Warlock이 spell을 배우게 만든다.
+* forgetSpell, 마법의 이름에 해당하는 string을 받고 마법사가 이를 잊게 한다.
+만약 알고 있는 마법이 아니면 아무것도 하지 않는다.
+* launchSpell, string( 마법 이름 )과 ATarget의 const 참조자를 매개 변수로 받고
+해당하는 스펠을 lauch 한다. 알고 있는게 아니라면 아무거솓 하지 않는다.
+
+워록이 알고 있는 주문을 저장하려면 새로운 데이터 멤버가 필요하다.
+가장 좋은 것을 고르는 것은 당신에게 달려있다.
+
+int main()
+{
+  Warlock richard("Richard", "thㄱe Titled");
+
+  Dummy bob;
+  Fwoosh* fwoosh = new Fwoosh();
+
+  richard.learnSpell(fwoosh);
+
+  richard.introduce();
+  richard.launchSpell("Fwoosh", bob);
+
+  richard.forgetSpell("Fwoosh");
+  richard.launchSpell("Fwoosh", bob);
+}
+
+~$ ./a.out | cat -e
+Richard: This looks like another boring day.$
+Richard: I am Richard, the Titled!$
+Target Practice Dummy has been fwooshed!$
+Richard: My job here is done!$
