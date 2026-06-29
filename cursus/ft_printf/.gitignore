@@ -1,0 +1,27 @@
+# Object files
+*.o
+*.obj
+
+# Libraries
+*.lib
+*.a
+
+# Executables
+*.exe
+*.out
+ft_printf
+
+# LLDB
+*.dSYM
+
+# Header
+*.gch
+
+# Tester
+pft/
+ft_printf_tester/
+printfTester/
+tester/
+
+# Swap
+*.swp
