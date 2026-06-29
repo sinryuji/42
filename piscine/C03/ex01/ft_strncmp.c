@@ -1,0 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyeongki <hyeongki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/11 13:57:29 by hyeongki          #+#    #+#             */
+/*   Updated: 2022/01/17 14:16:46 by hyeongki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+int	ft_strncmp(char *s1, char *s2, unsigned int n)
+{
+	unsigned int	i;
+
+	i = 0;
+	if (n == 0)
+	{
+		return (0);
+	}
+	while (s1[i] && s2[i] && s1[i] == s2[i] && i < n)
+		i++;
+	if (i == n)
+		i--;
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
