@@ -1,0 +1,26 @@
+# Object files
+*.o
+*.obj
+
+# Libraries
+*.lib
+*.a
+
+# Executables
+*.exe
+*.out
+push_swap
+checker
+
+# LLDB
+*.dSYM
+
+# Header
+*.gch
+
+# Swap
+*.swp
+
+# Tester
+push_swap_tester/
+push_swap_tester2/
